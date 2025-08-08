@@ -67,7 +67,6 @@ module.exports = client = async (client, m, chatUpdate, store) => {
             return {
                 id: p.id || null,
                 jid: p.jid || null,
-                lid: p.lid || null,
                 admin,
                 full: p
             };
