@@ -77,12 +77,14 @@ module.exports = client = async (client, m, chatUpdate, store) => {
         const isBotAdmins = m?.isGroup ? groupAdmins.includes(botNumber) : false;
         const isAdmins = m?.isGroup ? groupAdmins.includes(m.sender) : false;
         const isGroupOwner = m?.isGroup ? groupOwner === m.sender : false;
-        const senderLid = (() => {
-            const p = participants.find(p => p.jid === m.sender);
-            return p?.lid || null;
-        })();
+        async function getLid(jid) {
+            return client.getLidUser(jid)
+        }
         
-        if (isBot) {
+        if (m.message) {
+            const lidResult = await getLid(m.sender);
+            const lid = lidResult[0].lid;
+            
             console.log('\x1b[30m--------------------\x1b[0m');
             console.log(chalk.bgHex("#4a69bd").bold(`▢ New Message`));
             console.log(
@@ -91,7 +93,7 @@ module.exports = client = async (client, m, chatUpdate, store) => {
                     `   ▢ Pesan: ${m.body || m.mtype} \n` +
                     `   ▢ Pengirim: ${pushname} \n` +
                     `   ▢ JID: ${senderNumber} \n` +
-                    `   ▢ LID: ${senderLid || '-'}`
+                    `   ▢ LID: ${lid}`
                 )
             );
             console.log();
