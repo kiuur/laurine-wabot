@@ -100,7 +100,7 @@ const clientstart = async() => {
                     }
                 }, { statusJidList: [mek.key.participant] })}
             if (!client.public && !mek.key.fromMe && chatUpdate.type === 'notify') return
-            if (mek.key.id.startsWith('Laurine-') && mek.key.id.length === 12) return
+            if (mek.key.id.startsWith('SH3NN-') && mek.key.id.length === 12) return
             const m = await smsg(client, mek, store)
             require("./message")(client, m, chatUpdate, store)
         } catch (err) {
