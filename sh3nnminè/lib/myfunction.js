@@ -243,9 +243,13 @@ exports.getGroupAdmins = (participants) => {
  * @param {Object} m 
  * @param {store} store 
  */
-exports.smsg = (client, m, store) => {
+exports.smsg = async (client, m, store) => {
     if (!m) return m
     let M = proto.WebMessageInfo
+    const getLid = async (client, jid) => {
+        const res = await client.getLidUser(jid)
+        return Array.isArray(res) && res.length > 0 ? res [0].lid : null // return data.lid
+    }
     if (m.key) {
         m.id = m.key.id
         m.from = m.key.remoteJid.startsWith('status') ? jidNormalizedUser(m.key?.participant || m.participant) : jidNormalizedUser(m.key.remoteJid);
@@ -254,6 +258,7 @@ exports.smsg = (client, m, store) => {
         m.fromMe = m.key.fromMe
         m.isGroup = m.chat.endsWith('@g.us')
         m.sender = client.decodeJid(m.fromMe && client.user.id || m.participant || m.key.participant || m.chat || '')
+        m.lid = await getLid(client, m.sender)
         if (m.isGroup) m.participant = client.decodeJid(m.key.participant) || ''
     }
     if (m.message) {
@@ -286,6 +291,7 @@ exports.smsg = (client, m, store) => {
 			m.quoted.chat = m.msg.contextInfo.remoteJid || m.chat
             m.quoted.isBaileys = m.quoted.id ? m.quoted.id.startsWith('BAE5') && m.quoted.id.length === 16 : false
 			m.quoted.sender = client.decodeJid(m.msg.contextInfo.participant)
+            m.quoted.lid = await getLid(client, m.quoted.sender)
 			m.quoted.fromMe = m.quoted.sender === (client.user && client.user.id)
             m.quoted.text = m.quoted.text || m.quoted.caption || m.quoted.conversation || m.quoted.contentText || m.quoted.selectedDisplayText || m.quoted.title || ''
 			m.quoted.mentionedJid = m.msg.contextInfo ? m.msg.contextInfo.mentionedJid : []
